@@ -89,6 +89,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\solution\packages\BouncyCastle.1.8.5\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\solution\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -96,9 +99,39 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="POIFS\Crypt\Agile\AgileDecryptor.cs" />
+    <Compile Include="POIFS\Crypt\Agile\AgileEncryptionHeader.cs" />
+    <Compile Include="POIFS\Crypt\Agile\AgileEncryptionInfoBuilder.cs" />
+    <Compile Include="POIFS\Crypt\Agile\AgileEncryptionVerifier.cs" />
+    <Compile Include="POIFS\Crypt\Agile\AgileEncryptor.cs" />
+    <Compile Include="POIFS\Crypt\Agile\KeyPair.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\CertificateSecurityException.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\DigestInfo.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\ExpiredCertificateSecurityException.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Facets\EnvelopedSignatureFacet.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Facets\KeyInfoSignatureFacet.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Facets\Office2010SignatureFacet.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Facets\OOXMLSignatureFacet.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Facets\SignatureFacet.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Facets\XAdESSignatureFacet.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Facets\XAdESXLSignatureFacet.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\ISignatureConfigurable.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\OOXMLURIDereferencer.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\RevokedCertificateSecurityException.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Services\RevocationData.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Services\RevocationDataService.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Services\SignaturePolicyService.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Services\TimeStampService.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Services\TimeStampServiceValidator.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\Services\TSPTimeStampService.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\SignatureConfig.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\SignatureInfo.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\SignatureMarshalListener.cs" />
+    <Compile Include="POIFS\Crypt\Dsig\TrustCertificateSecurityException.cs" />
     <Compile Include="POIXMLDocument.cs" />
     <Compile Include="POIXMLDocumentPart.cs" />
     <Compile Include="POIXmlException.cs" />
@@ -110,7 +143,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SS\Converter\ExcelToHtmlConverter.cs" />
     <Compile Include="SS\Converter\ExcelToHtmlUtils.cs" />
-    <Compile Include="SS\UserModel\IndexedColors.cs" />
     <Compile Include="SS\UserModel\WorkbookFactory.cs" />
     <Compile Include="Util\IdentifierManager.cs" />
     <Compile Include="Util\PackageHelper.cs" />
@@ -155,6 +187,8 @@
     <Compile Include="XSSF\Streaming\Values\StringFormulaValue.cs" />
     <Compile Include="XSSF\Streaming\Values\StringValue.cs" />
     <Compile Include="XSSF\Streaming\Values\Value.cs" />
+    <Compile Include="XSSF\UserModel\BaseXSSFEvaluationWorkbook.cs" />
+    <Compile Include="XSSF\UserModel\BaseXSSFFormulaEvaluator.cs" />
     <Compile Include="XSSF\UserModel\Charts\AbstractXSSFChartSeries.cs" />
     <Compile Include="XSSF\UserModel\Charts\XSSFBarChartData.cs" />
     <Compile Include="XSSF\UserModel\Charts\XSSFCategoryAxis.cs" />
@@ -186,6 +220,8 @@
     <Compile Include="XSSF\UserModel\Helpers\ColumnHelper.cs" />
     <Compile Include="XSSF\UserModel\Helpers\HeaderFooterHelper.cs" />
     <Compile Include="XSSF\UserModel\Helpers\XSSFFormulaUtils.cs" />
+    <Compile Include="XSSF\UserModel\Helpers\XSSFIgnoredErrorHelper.cs" />
+    <Compile Include="XSSF\UserModel\Helpers\XSSFPasswordHelper.cs" />
     <Compile Include="XSSF\UserModel\Helpers\XSSFRowShifter.cs" />
     <Compile Include="XSSF\UserModel\Helpers\XSSFSingleXmlCell.cs" />
     <Compile Include="XSSF\UserModel\Helpers\XSSFXmlColumnPr.cs" />
@@ -207,11 +243,14 @@
     <Compile Include="XSSF\UserModel\XSSFChildAnchor.cs" />
     <Compile Include="XSSF\UserModel\XSSFClientAnchor.cs" />
     <Compile Include="XSSF\UserModel\XSSFColor.cs" />
+    <Compile Include="XSSF\UserModel\XSSFColorScaleFormatting.cs" />
     <Compile Include="XSSF\UserModel\XSSFComment.cs" />
     <Compile Include="XSSF\UserModel\XSSFConditionalFormatting.cs" />
     <Compile Include="XSSF\UserModel\XSSFConditionalFormattingRule.cs" />
+    <Compile Include="XSSF\UserModel\XSSFConditionalFormattingThreshold.cs" />
     <Compile Include="XSSF\UserModel\XSSFConnector.cs" />
     <Compile Include="XSSF\UserModel\XSSFCreationHelper.cs" />
+    <Compile Include="XSSF\UserModel\XSSFDataBarFormatting.cs" />
     <Compile Include="XSSF\UserModel\XSSFDataFormat.cs" />
     <Compile Include="XSSF\UserModel\XSSFDataValidation.cs" />
     <Compile Include="XSSF\UserModel\XSSFDataValidationConstraint.cs" />
@@ -230,6 +269,7 @@
     <Compile Include="XSSF\UserModel\XSSFFontFormatting.cs" />
     <Compile Include="XSSF\UserModel\XSSFFormulaEvaluator.cs" />
     <Compile Include="XSSF\UserModel\XSSFGraphicFrame.cs" />
+    <Compile Include="XSSF\UserModel\XSSFIconMultiStateFormatting.cs" />
     <Compile Include="XSSF\UserModel\XSSFLineBreak.cs" />
     <Compile Include="XSSF\UserModel\XSSFMap.cs" />
     <Compile Include="XSSF\UserModel\XSSFName.cs" />
@@ -256,17 +296,19 @@
     <Compile Include="XSSF\UserModel\XSSFTextBox.cs" />
     <Compile Include="XSSF\UserModel\XSSFTextParagraph.cs" />
     <Compile Include="XSSF\UserModel\XSSFTextRun.cs" />
+    <Compile Include="XSSF\UserModel\XSSFVBAPart.cs" />
     <Compile Include="XSSF\UserModel\XSSFVMLDrawing.cs" />
     <Compile Include="XSSF\UserModel\XSSFWorkbook.cs" />
+    <Compile Include="XSSF\UserModel\XSSFWorkbookType.cs" />
     <Compile Include="XSSF\Util\CTColComparator.cs" />
     <Compile Include="XSSF\Util\EvilUnclosedBRFixingInputStream.cs" />
     <Compile Include="XSSF\Util\NumericRange.cs" />
+    <Compile Include="XSSF\Util\XmlEnumParser.cs" />
     <Compile Include="XSSF\XLSBUnsupportedException.cs" />
     <Compile Include="XWPF\Extractor\XWPFWordExtractor.cs" />
     <Compile Include="XWPF\Model\XMLParagraph.cs" />
     <Compile Include="XWPF\Model\XWPFCommentsDecorator.cs" />
     <Compile Include="XWPF\Model\XWPFHeaderFooterPolicy.cs" />
-    <Compile Include="XWPF\Model\XWPFHyperlinkDecorator.cs" />
     <Compile Include="XWPF\Model\XWPFParagraphDecorator.cs" />
     <Compile Include="XWPF\Usermodel\AbstractXWPFSDT.cs" />
     <Compile Include="XWPF\Usermodel\BodyElementType.cs" />
@@ -297,8 +339,10 @@
     <Compile Include="XWPF\Usermodel\XWPFDefaultParagraphStyle.cs" />
     <Compile Include="XWPF\Usermodel\XWPFDefaultRunStyle.cs" />
     <Compile Include="XWPF\Usermodel\XWPFDocument.cs" />
+    <Compile Include="XWPF\Usermodel\XWPFRad.cs" />
     <Compile Include="XWPF\Usermodel\XWPFF.cs" />
     <Compile Include="XWPF\Usermodel\XWPFFactory.cs" />
+    <Compile Include="XWPF\Usermodel\XWPFFieldRun.cs" />
     <Compile Include="XWPF\Usermodel\XWPFFooter.cs" />
     <Compile Include="XWPF\Usermodel\XWPFFootnote.cs" />
     <Compile Include="XWPF\Usermodel\XWPFFootnotes.cs" />
@@ -323,6 +367,7 @@
     <Compile Include="XWPF\Usermodel\XWPFSDTContentCell.cs" />
     <Compile Include="XWPF\Usermodel\XWPFSettings.cs" />
     <Compile Include="XWPF\Usermodel\XWPFSharedRun.cs" />
+    <Compile Include="XWPF\Usermodel\XWPFSSup.cs" />
     <Compile Include="XWPF\Usermodel\XWPFSSub.cs" />
     <Compile Include="XWPF\Usermodel\XWPFStyle.cs" />
     <Compile Include="XWPF\Usermodel\XWPFStyles.cs" />
@@ -366,6 +411,7 @@
     <None Include="..\main\npoi.snk">
       <Link>npoi.snk</Link>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="XWPF\Util\" />

@@ -15,6 +15,7 @@
    limitations under the License.
 ==================================================================== */
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -40,9 +41,9 @@ namespace NPOI.XSSF.Streaming
         public int NumberLastFlushedRow = -1; // meaningful only of _numberOfFlushedRows>0
 
         /**
- * Table of strings shared across this workbook.
- * If two cells contain the same string, then the cell value is the same index into SharedStringsTable
- */
+         * Table of strings shared across this workbook.
+         * If two cells contain the same string, then the cell value is the same index into SharedStringsTable
+         */
         private SharedStringsTable _sharedStringSource;
 
         public SheetDataWriter()
@@ -55,13 +56,13 @@ namespace NPOI.XSSF.Streaming
             _sharedStringSource = sharedStringsTable;
         }
         /**
- * Create a temp file to write sheet data. 
- * By default, temp files are created in the default temporary-file directory
- * with a prefix "poi-sxssf-sheet" and suffix ".xml".  Subclasses can override 
- * it and specify a different temp directory or filename or suffix, e.g. <code>.gz</code>
- * 
- * @return temp file to write sheet data
- */
+         * Create a temp file to write sheet data. 
+         * By default, temp files are created in the default temporary-file directory
+         * with a prefix "poi-sxssf-sheet" and suffix ".xml".  Subclasses can override 
+         * it and specify a different temp directory or filename or suffix, e.g. <code>.gz</code>
+         * 
+         * @return temp file to write sheet data
+         */
        
         public virtual FileInfo CreateTempFile()
         {
@@ -116,7 +117,7 @@ namespace NPOI.XSSF.Streaming
             {
                 OutputStream.Flush();
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -124,7 +125,7 @@ namespace NPOI.XSSF.Streaming
             {
                 OutputStream.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -132,6 +133,13 @@ namespace NPOI.XSSF.Streaming
 
         }
 
+        public FileInfo TempFileInfo
+        {
+            get
+            {
+                return TemporaryFileInfo;
+            }
+        }
         /**
          * @return a stream to read temp file with the sheet data
          */
@@ -164,8 +172,6 @@ namespace NPOI.XSSF.Streaming
             return fis;
         }
 
-
-
         protected void Finalize()
         {
             TemporaryFileInfo.Delete();
@@ -181,7 +187,7 @@ namespace NPOI.XSSF.Streaming
          * @param rownum 0-based row number
          * @param row    a row
          */
-        public void WriteRow(int rownum, IRow row)
+        public void WriteRow(int rownum, SXSSFRow row)
         {
             if (NumberOfFlushedRows == 0)
             {
@@ -192,22 +198,23 @@ namespace NPOI.XSSF.Streaming
             NumberOfCellsOfLastFlushedRow = row.LastCellNum;
             NumberOfFlushedRows++;
             BeginRow(rownum, row);
-            var cells = row.GetEnumerator();
+            var cells = row.AllCellsIterator();
             int columnIndex = 0;
-            while (cells.MoveNext())
+            while (cells.HasNext())
             {
-                WriteCell(columnIndex++, cells.Current);
+                WriteCell(columnIndex++, cells.Next());
             }
             EndRow();
         }
 
-        private void BeginRow(int rownum, IRow row)
+        private void BeginRow(int rownum, SXSSFRow row1)
         {
+            SXSSFRow row = row1 as SXSSFRow;
             WriteAsBytes(OutputStream, "<row r=\"" + (rownum + 1) + "\"");
 
             if (row.HasCustomHeight())
             {
-                WriteAsBytes(OutputStream, " customHeight=\"true\"  ht=\"" + row.HeightInPoints + "\"");
+                WriteAsBytes(OutputStream, " customHeight=\"1\"  ht=\"" + row.HeightInPoints + "\"");
 
             }
             if (row.ZeroHeight)
@@ -217,7 +224,7 @@ namespace NPOI.XSSF.Streaming
             }
             if (row.IsFormatted)
             {
-                WriteAsBytes(OutputStream, " s=\"" + row.RowStyle.Index + "\"");
+                WriteAsBytes(OutputStream, " s=\"" + row.RowStyleIndex + "\"");
 
                 WriteAsBytes(OutputStream, " customFormat=\"1\"");
 
@@ -258,13 +265,13 @@ namespace NPOI.XSSF.Streaming
             }
             string cellRef = new CellReference(RowNum, columnIndex).FormatAsString();
             WriteAsBytes(OutputStream, "<c r=\"" + cellRef + "\"");
-
-            if (cell.CellStyle.Index != 0)
+            ICellStyle cellStyle = cell.CellStyle;
+            if (cellStyle.Index != 0)
             {
                 // need to convert the short to unsigned short as the indexes can be up to 64k
                 // ideally we would use int for this index, but that would need changes to some more 
                 // APIs
-                WriteAsBytes(OutputStream, " s=\"" + (cell.CellStyle.Index & 0xffff) + "\"");
+                WriteAsBytes(OutputStream, " s=\"" + (cellStyle.Index & 0xffff) + "\"");
             }
             switch (cell.CellType)
             {
@@ -288,7 +295,7 @@ namespace NPOI.XSSF.Streaming
                                 double nval = cell.NumericCellValue;
                                 if (!Double.IsNaN(nval))
                                 {
-                                    WriteAsBytes(OutputStream, "<v>" + nval + "</v>");
+                                    WriteAsBytes(OutputStream, "<v>" + nval.ToString(CultureInfo.InvariantCulture) + "</v>");
                                 }
                                 break;
                             default:
@@ -329,7 +336,7 @@ namespace NPOI.XSSF.Streaming
                 case CellType.Numeric:
                     {
                         WriteAsBytes(OutputStream, " t=\"n\">");
-                        WriteAsBytes(OutputStream, "<v>" + cell.NumericCellValue + "</v>");
+                        WriteAsBytes(OutputStream, "<v>" + cell.NumericCellValue.ToString(CultureInfo.InvariantCulture) + "</v>");
                         break;
                     }
                 case CellType.Boolean:
@@ -512,7 +519,8 @@ namespace NPOI.XSSF.Streaming
             finally
             {
                 TemporaryFileInfo.Delete();
-                ret = File.Exists(TemporaryFileInfo.FullName);
+                ret = !File.Exists(TemporaryFileInfo.FullName);
+                TemporaryFileInfo.Refresh();
             }
             return ret;
         }
